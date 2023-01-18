@@ -2,11 +2,44 @@ import Flutter
 import UIKit
 import Mindbox
 
+class MindboxInAppMessagesDelegate: InAppMessagesDelegate {
+    let channel: FlutterBasicMessageChannel;
+
+    init(controller: FlutterBinaryMessenger) {
+        channel = FlutterBasicMessageChannel(
+            name: "mindbox-in-app-push",
+            binaryMessenger: controller,
+            codec: FlutterJSONMessageCodec.sharedInstance())
+    }
+
+    func inAppMessageTapAction(id: String, url: URL?, payload: String) {
+        channel.sendMessage([
+            "name": "open",
+            "event": [
+                "id": id,
+                "redirectUrl": url?.absoluteString,
+                "payload": payload
+            ]
+        ])
+    }
+
+    func inAppMessageDismissed(id: String) {
+        channel.sendMessage([
+            "name": "close",
+            "event": [
+                "id": id
+            ]
+        ])
+    }
+}
+
 public class SwiftMindboxIosPlugin: NSObject, FlutterPlugin {
     private static var channel: FlutterMethodChannel?
+    private static var inAppMessagesDelegate: MindboxInAppMessagesDelegate?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         channel = FlutterMethodChannel(name: "mindbox.cloud/flutter-sdk", binaryMessenger: registrar.messenger())
+        inAppMessagesDelegate = MindboxInAppMessagesDelegate(controller: registrar.messenger())
         let instance = SwiftMindboxIosPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel!)
     }
@@ -70,6 +103,7 @@ public class SwiftMindboxIosPlugin: NSObject, FlutterPlugin {
                 do{
                     let config = try MBConfiguration(endpoint: endpoint, domain: domain,previousInstallationId: prevId, previousDeviceUUID: prevUuid, subscribeCustomerIfCreated: subscribeIfCreated, shouldCreateCustomer: shouldCreateCustomer)
                     Mindbox.shared.initialization(configuration: config)
+                    Mindbox.shared.inAppMessagesDelegate = SwiftMindboxIosPlugin.inAppMessagesDelegate
                     result("initialized")
                 }catch let error {
                     result(FlutterError(code: "-1", message: error.localizedDescription, details: nil))
