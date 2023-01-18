@@ -7,14 +7,53 @@ import android.os.Looper
 import androidx.annotation.NonNull
 import cloud.mindbox.mobile_sdk.Mindbox
 import cloud.mindbox.mobile_sdk.MindboxConfiguration
+import cloud.mindbox.mobile_sdk.inapp.presentation.InAppCallback
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.BasicMessageChannel
+import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.JSONMessageCodec
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.NewIntentListener
+
+class MindboxInAppCallback(binaryMessenger: BinaryMessenger) : InAppCallback {
+
+    private val chanel = BasicMessageChannel(
+        binaryMessenger,
+        "mindbox-in-app-push",
+        JSONMessageCodec.INSTANCE,
+    );
+
+    override fun onInAppClick(id: String, redirectUrl: String, payload: String) {
+        println("onInAppClick")
+        chanel.send(
+            mapOf(
+                "name" to "open",
+                "event" to mapOf(
+                    "id" to id,
+                    "redirectUrl" to redirectUrl,
+                    "payload" to payload
+                )
+            )
+        )
+    }
+
+    override fun onInAppDismissed(id: String) {
+        println("onInAppDismissed")
+        chanel.send(
+            mapOf(
+                "name" to "close",
+                "event" to mapOf(
+                    "id" to id,
+                )
+            )
+        )
+    }
+}
 
 /** MindboxAndroidPlugin */
 class MindboxAndroidPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, NewIntentListener {
@@ -22,6 +61,7 @@ class MindboxAndroidPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, Ne
     private var binding: ActivityPluginBinding? = null
     private var deviceUuidSubscription: String? = null
     private var tokenSubscription: String? = null
+    private  lateinit var inAppCallback: MindboxInAppCallback
     lateinit var channel: MethodChannel
 
     companion object {
@@ -35,6 +75,7 @@ class MindboxAndroidPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, Ne
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        inAppCallback = MindboxInAppCallback(flutterPluginBinding.binaryMessenger)
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "mindbox.cloud/flutter-sdk")
         channel.setMethodCallHandler(this)
     }
@@ -60,6 +101,7 @@ class MindboxAndroidPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, Ne
                         .shouldCreateCustomer(shouldCreateCustomer)
                         .build()
                     Mindbox.init(context, config, listOf())
+                    Mindbox.registerInAppCallback()
                     result.success("initialized")
                 } else {
                     result.error("-1", "Initialization error", "Wrong argument type")
