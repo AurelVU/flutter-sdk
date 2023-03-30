@@ -10,6 +10,7 @@ import cloud.mindbox.mobile_sdk.MindboxConfiguration
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -23,6 +24,7 @@ class MindboxAndroidPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, Ne
     private var deviceUuidSubscription: String? = null
     private var tokenSubscription: String? = null
     lateinit var channel: MethodChannel
+    lateinit var binaryMessenger: BinaryMessenger
 
     companion object {
         @Deprecated(
@@ -35,6 +37,7 @@ class MindboxAndroidPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, Ne
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        binaryMessenger = flutterPluginBinding.binaryMessenger
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "mindbox.cloud/flutter-sdk")
         channel.setMethodCallHandler(this)
     }
@@ -59,7 +62,8 @@ class MindboxAndroidPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, Ne
                         .subscribeCustomerIfCreated(subscribeIfCreated)
                         .shouldCreateCustomer(shouldCreateCustomer)
                         .build()
-                    Mindbox.init(context, config, listOf())
+                    Mindbox.init(context.applicationContext, config, listOf())
+                    Mindbox.registerInAppCallback(MindboxInAppCallback(binaryMessenger))
                     result.success("initialized")
                 } else {
                     result.error("-1", "Initialization error", "Wrong argument type")
