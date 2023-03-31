@@ -62,8 +62,8 @@ class MindboxAndroidPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, Ne
                         .subscribeCustomerIfCreated(subscribeIfCreated)
                         .shouldCreateCustomer(shouldCreateCustomer)
                         .build()
-                    Mindbox.init(context.applicationContext, config, listOf())
-                    Mindbox.registerInAppCallback(MindboxInAppCallback(binaryMessenger))
+                    Mindbox.init(context, config, listOf())
+//                    Mindbox.registerInAppCallback(MindboxInAppCallback(binaryMessenger))
                     result.success("initialized")
                 } else {
                     result.error("-1", "Initialization error", "Wrong argument type")
