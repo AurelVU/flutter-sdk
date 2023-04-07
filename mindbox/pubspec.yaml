@@ -20,7 +20,10 @@ dependencies:
   flutter:
     sdk: flutter
   mindbox_android:
-    path: ../mindbox_android
+    git:
+      url: https://github.com/AurelVU/flutter-sdk.git
+      path: mindbox_android
+      ref: local-maven
   mindbox_ios:
     git:
       url: https://github.com/AurelVU/flutter-sdk.git
