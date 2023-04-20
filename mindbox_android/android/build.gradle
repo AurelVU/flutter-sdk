@@ -55,4 +55,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 //    implementation files('libs/sdk-release.aar')
     implementation 'cloud.mindbox:fittin-mobile-sdk:2.1.10'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
