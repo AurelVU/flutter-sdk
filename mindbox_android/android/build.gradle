@@ -19,7 +19,7 @@ rootProject.allprojects {
         google()
         jcenter()
         mavenCentral()
-
+        mavenLocal()
         flatDir {
             dirs("libs")
         }
@@ -53,6 +53,6 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation files('libs/sdk-release.aar')
-//    implementation 'cloud.mindbox:mobile-sdk:2.1.10'
+//    implementation files('libs/sdk-release.aar')
+    implementation 'cloud.mindbox:fittin-mobile-sdk:2.1.10'
 }
