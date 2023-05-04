@@ -25,7 +25,7 @@ dependencies:
       url: https://github.com/AurelVU/flutter-sdk.git
       path: mindbox_ios
       ref: inapp_flutter_support
-  mindbox_platform_interface: ^2.1.1
+  mindbox_platform_interface: 2.1.1
 
 dev_dependencies:
   flutter_test:
