@@ -19,7 +19,11 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  mindbox_android: ^2.2.0
+  mindbox_android:
+    git:
+      url: https://github.com/AurelVU/flutter-sdk.git
+      path: mindbox_android
+      ref: inapp_flutter_support
   mindbox_ios:
     git:
       url: https://github.com/AurelVU/flutter-sdk.git
