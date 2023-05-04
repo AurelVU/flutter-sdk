@@ -18,7 +18,11 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  mindbox_platform_interface: ^2.1.1
+  mindbox_platform_interface:
+    git:
+      url: https://github.com/AurelVU/flutter-sdk.git
+      path: mindbox_platform_interface
+      ref: inapp_flutter_support
 
 dev_dependencies:
   flutter_test:
